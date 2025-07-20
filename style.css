@@ -1,0 +1,145 @@
+.text-pink {
+    color: #d63384;
+  }
+  
+  .navbar-brand img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+  
+  .navbar-light .nav-link {
+    color: #555;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-light .nav-link:hover {
+    color: #d63384;
+    font-weight: 500;
+  }
+  
+  .top-bar a:hover {
+    text-decoration: underline;
+  }
+
+
+  .hover-style:hover {
+    background-color: #ffe6ec;
+    color: #d63384 !important;
+    transition: all 0.3s ease;
+  }
+
+ 
+  /* Background Image */
+  .bg-cover {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* Overlay on Slider Content */
+  .carousel-item .container {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 40px;
+    border-radius: 10px;
+  }
+  
+  .product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+  
+  .category-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .category-card:hover {
+    transform: scale(1.05);
+  }
+  .category-img {
+    height: 150px;
+    object-fit: cover;
+  }
+  /* Optional - Subtle hover effect for accordion */
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #000;
+  }
+  
+  /* Smooth shadow card for form */
+  .card {
+    border-radius: 12px;
+  }
+  
+  /* Button style override */
+  .btn-primary {
+    background-color: #ff69b4;
+    border: none;
+  }
+  .btn-primary:hover {
+    background-color: #e754a3;
+  }
+  
+
+
+
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+}
+
+h2, h4, h5 {
+  color: #333;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.btn-pink {
+  background-color: #ff5c8d;
+  border: none;
+}
+.btn-pink:hover {
+  background-color: #e14c7a;
+}
+
+.card.shadow-sm {
+  height: 350px;           /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make all product images the same height and object-fit */
+.card-img-top {
+  height: 180px;           /* Adjust as needed */
+  object-fit: cover;
+}
+
+
+.card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.product-card {
+  display: none;
+}
+.product-card:nth-child(-n+6) {
+  display: block;
+}
