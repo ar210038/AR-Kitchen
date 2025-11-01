@@ -1,0 +1,22 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block title %}Gift Boxes - AR Kitchen{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center fw-bold mb-5" style="color: #502912;">Gift Boxes</h2>
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <img src="{% static 'images/gift1.jpg' %}" class="card-img-top" alt="Mini Box">
+                <div class="card-body">
+                    <h5>Mini Sweet Box</h5>
+                    <p>6 mini cakes + card</p>
+                    <p class="fw-bold">৳800</p>
+                    <a href="#" class="btn btn-outline-primary">Order</a>
+                </div>
+            </div>
+        </div>
+        <!-- Add more -->
+    </div>
+</div>
+{% endblock %}

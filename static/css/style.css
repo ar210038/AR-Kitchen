@@ -1,0 +1,596 @@
+.top-bar {
+    background: linear-gradient(90deg, #502912 0%, #a67c52 100%);
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+/* Divider below top bar */
+.divider {
+    border-top: 2px solid #e5e5e5;
+}
+
+/* Vertical divider for navbar */
+.vertical-divider {
+    width: 2px;
+    height: 32px;
+    background: linear-gradient(180deg, #e5e5e5 60%, #fff 100%);
+    opacity: 0.5;
+    margin: 0 10px;
+    border-radius: 2px;
+}
+
+/* Navbar hover */
+.navbar-nav .nav-link:hover {
+    color: #a67c52;
+    background: #f8f5f2;
+    border-radius: 20px;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* Dropdown hover effect */
+.navbar-nav .dropdown-menu a.dropdown-item:hover {
+    background: #ffe9d6;
+    color: #502912;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* Stylish toggle button */
+.navbar-toggler {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 6px 10px !important;
+}
+
+/* Make the icon green on hover */
+.navbar-toggler:hover i,
+.navbar-toggler:focus i {
+    color: #e23409e3 !important; 
+    transition: color 0.2s;
+}
+
+/* Optional: default icon color */
+.navbar-toggler i {
+    color: #492c0f;
+    transition: color 0.2s;
+}
+
+/* Search input stylish */
+.input-group .form-control {
+    border-radius: 30px 0 0 30px !important;
+    border: 1.5px solid #a67c52;
+    background: #fff8f3;
+}
+
+.input-group .btn-success {
+    border-radius: 0 30px 30px 0 !important;
+    background: linear-gradient(90deg, #a67c52 0%, #502912 100%);
+    border: none;
+}
+
+.input-group .btn-success i {
+    color: #fff;
+}
+
+
+    @media (max-width: 992px) {
+        .navbar-collapse {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .navbar-nav .nav-link {
+            padding: 0.5rem 1rem !important;
+        }
+    }
+    .hover-style:hover {
+        color: #502912 !important;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+
+.footer {
+  background-color: #682904; /* Orange like in your screenshot */
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Brand & About Styling */
+.brand-about .brand-name {
+    color: #f8b400; /* Brand accent color */
+    letter-spacing: 1px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover effect on brand name */
+.brand-about .brand-name:hover {
+    color: #ffd166;
+    transform: scale(1.05);
+}
+
+/* Brand description */
+.brand-about .brand-desc {
+    color: #f1f1f1;
+    line-height: 1.5;
+}
+
+/* Social icons styling */
+.social-icons .social-link {
+    color: #f1f1f1;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect on social icons */
+.social-icons .social-link:hover {
+    color: #ffd166; /* golden hover */
+    transform: scale(1.3) rotate(10deg);
+    text-shadow: 0 0 8px rgba(255, 209, 102, 0.7);
+}
+
+
+/* Quick Links Styling */
+.quick-links h6 {
+    color: #f8b400; /* Accent color for heading */
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+/* Links styling */
+.quick-links a {
+    color: #f1f1f1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+/* Hover effects */
+.quick-links a:hover {
+    color: #ffd166; /* Golden hover color */
+    text-shadow: 0 0 8px rgba(255, 209, 102, 0.7);
+    transform: translateX(5px); /* slight movement effect */
+}
+
+/* Optional: add bullet spacing */
+.quick-links ul li {
+    margin-bottom: 8px;
+}
+
+
+/* Contact Info Styling */
+.contact-info h6 {
+    color: #f8b400; /* Accent color */
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.contact-info .contact-link {
+    color: #f1f1f1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.contact-info .contact-link i {
+    margin-right: 6px;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Hover Effects */
+.contact-info .contact-link:hover {
+    color: #ffd166;
+    text-shadow: 0 0 8px rgba(255, 209, 102, 0.7);
+}
+
+.contact-info .contact-link:hover i {
+    color: #ffd166;
+    transform: scale(1.2) rotate(10deg);
+}
+
+/* Footer Map & Payment */
+.footer-map h6 {
+    color: #f8b400;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.footer-map iframe {
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease;
+}
+
+/* Slight zoom on hover for map */
+.footer-map iframe:hover {
+    transform: scale(1.02);
+}
+
+/* Payment methods */
+.payment-methods img,
+.payment-methods i {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.payment-methods img:hover,
+.payment-methods i:hover {
+    transform: scale(1.2) rotate(10deg);
+    filter: brightness(1.2);
+}
+
+/* Footer bottom text */
+.footer-bottom {
+    text-align: center;
+    margin-top: 5px;
+    color: #f1f1f1;
+    font-size: 0.85rem;
+}
+
+.footer-bottom a {
+    color: #ffd166;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer-bottom a:hover {
+    text-shadow: 0 0 8px rgba(255, 209, 102, 0.7);
+    transform: scale(1.05);
+}
+
+    .chat-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        font-family: inherit;
+    }
+
+    .chat-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        border: none;
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        animation: pulse 2s infinite;
+    }
+
+    .chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 25px rgba(255, 107, 107, 0.5);
+    }
+
+    .chat-btn.active {
+        background: #dc3545;
+        animation: none;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+    }
+
+    .chat-text {
+        position: absolute;
+        bottom: 75px;
+        right: 0;
+        background: #502912;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        opacity: 1;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .chat-text::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        right: 20px;
+        border: 8px solid transparent;
+        border-top-color: #502912;
+    }
+
+    .chat-menu {
+        position: absolute;
+        bottom: 75px;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .chat-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .chat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        transform: scale(0);
+    }
+
+    .chat-menu.active .chat-icon {
+        transform: scale(1);
+        animation: popIn 0.5s ease forwards;
+    }
+
+    @keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        80% { transform: scale(1.15); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Icon Colors */
+    .call { background: #28a745; }
+    .whatsapp { background: #25d366; }
+    .location { background: #dc3545; }
+    .tiktok { background: #000; }
+    .instagram { background: #e4405f; }
+    .messenger { background: #0084ff; }
+
+    .chat-icon:hover {
+        transform: translateY(-5px) scale(1.1) !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .chat-widget { bottom: 15px; right: 15px; }
+        .chat-btn { width: 55px; height: 55px; font-size: 1.6rem; }
+        .chat-text { font-size: 0.8rem; padding: 8px 12px; bottom: 70px; }
+    }
+
+/* slider */
+.carousel-item {
+    height: 90vh;                  /* full viewport height */
+    background-size: cover;         /* scale image to cover container */
+    background-position: center;    /* center the image */
+    background-repeat: no-repeat;   /* prevent image repeating */
+    position: relative;
+}
+
+ .carousel-item .container {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 70px;
+    border-radius: 10px;
+  }
+  
+.carousel-item h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+    margin-bottom: 15px;
+}
+
+.carousel-item p {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.carousel-item .btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: #ffc107; /* Bootstrap warning color */
+    border: none;
+    color: #000;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.carousel-item .btn:hover {
+    transform: scale(1.08);
+    background: #ffdb4d;
+}
+.carousel-item h1 {
+    animation: fadeInDown 1s ease-in-out;
+}
+
+.carousel-item p {
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.carousel-item .btn {
+    animation: zoomIn 1.2s ease-in-out;
+}
+
+@keyframes fadeInDown {
+    from {opacity: 0; transform: translateY(-30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+@keyframes fadeInUp {
+    from {opacity: 0; transform: translateY(30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+@keyframes zoomIn {
+    from {opacity: 0; transform: scale(0.8);}
+    to {opacity: 1; transform: scale(1);}
+}
+
+/* Reviews Section Padding */
+
+#reviews {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+#reviews > .container {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 400px;
+}
+
+
+
+#reviews h2 { font-weight: 700;
+     text-transform: uppercase;
+      letter-spacing: 1px;
+       margin-bottom: 40px; } 
+.section-title { position: relative;
+     display: inline-block; 
+    /* only as wide as the text */ font-weight: 700;
+     text-transform: uppercase;
+      letter-spacing: 1px; 
+      margin-bottom: 40px;
+       padding-bottom: 10px; /* space for the underline */ } 
+    .section-title::after { content: '';
+         position: absolute;
+          left: 50%;
+           /* start at center of text */
+            bottom: 0; transform:translateX(-50%); /* shift left by 50% of width to center */
+             width: 60px; /* length of the underline */ height: 4px; /* thickness */ 
+            background: linear-gradient(90deg, #ffc107, #ff6f61); /* stylish gradient */ 
+            border-radius: 2px; } 
+    #reviews .carousel-item img { height: 250px;
+        width: 120px;
+         object-fit: cover; 
+         border-radius: 10px; 
+         box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+         transition: transform 0.3s ease; } 
+         #reviews .carousel-item img:hover { transform: scale(1.05); }
+
+
+
+    .category-card {
+        transition: all 0.3s ease;
+        background: #fff !important;
+    }
+    .category-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(80, 41, 18, 0.15) !important;
+        z-index: 10;
+    }
+    .category-card img {
+        transition: all 0.3s ease;
+    }
+    .category-card:hover img {
+        border-color: #502912 !important;
+    }
+    .hover-zoom {
+        cursor: pointer;
+    }
+    @media (max-width: 768px) {
+        .category-card h6 { font-size: 0.9rem; }
+        .category-card small { font-size: 0.75rem; }
+        .category-card img { width: 70px; height: 70px; }
+    }
+
+    
+    #faq .accordion-button {
+        background: #fff;
+        color: #502912;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+    }
+    #faq .accordion-button:not(.collapsed) {
+        background: #f8f9fa;
+        color: #502912;
+        box-shadow: none;
+    }
+    #faq .accordion-button::after {
+        filter: brightness(0) saturate(100%) invert(28%) sepia(87%) saturate(2476%) hue-rotate(346deg);
+    }
+    #faq .faq-item {
+        transition: all 0.3s;
+    }
+    #faq .faq-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(80,41,18,0.1) !important;
+    }
+
+
+
+    .feedback-card {
+        transition: all 0.3s ease;
+    }
+    .feedback-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(80,41,18,0.15) !important;
+    }
+    
+    
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 8px;
+        font-size: 2.2rem;
+    }
+    .star-rating input {
+        display: none;
+    }
+    .star-rating .star {
+        position: relative;
+        cursor: pointer;
+        width: 1.2em;
+        height: 1.2em;
+    }
+    .star-rating .star i {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: opacity 0.2s;
+    }
+    .star-rating .star .bi-star {
+        opacity: 1;
+        color: #ccc;
+    }
+    .star-rating .star .bi-star-fill {
+        opacity: 0;
+        color: #ffc107;
+    }
+
+    /* Fill when checked or hovered */
+    .star-rating input:checked ~ .star .bi-star-fill,
+    .star-rating .star:hover .bi-star-fill,
+    .star-rating .star:hover ~ .star .bi-star-fill {
+        opacity: 1;
+    }
+    .star-rating input:checked ~ .star .bi-star,
+    .star-rating .star:hover .bi-star,
+    .star-rating .star:hover ~ .star .bi-star {
+        opacity: 0;
+    }
+
+    /* Hover preview */
+    .star-rating .star:hover ~ .star .bi-star-fill {
+        opacity: 0;
+    }
+    .star-rating .star:hover ~ .star .bi-star {
+        opacity: 1;
+    }
+
+
+
+
+   

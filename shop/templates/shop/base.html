@@ -1,0 +1,445 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AR Kitchen{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+     
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar text-white py-1">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-5">
+            <marquee behavior="scroll" direction="left" scrollamount="5">
+                Dear valued customers, due to some operational inconveniences,
+                 our delivery is limited only to a few locations for the time being.
+                  However, the outlet pick-up option is available. We expect to resolve this issue soon. Thank you.
+            </marquee>
+        </div>
+        
+    </div>
+</div>
+
+<!-- ===== nav BAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container flex-column">
+        <!-- First row: Logo | Search (center, grows) | Icons | Toggle -->
+        <div class="w-100 d-flex align-items-center " style="min-height:100px;">
+            <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+                <i class="bi bi-list" style="font-size: 1.7rem;"></i>
+            </button>
+    <a class="navbar-brand d-flex align-items-center me-3" href="{% url 'shop:home' %}">
+                <img src="{% static 'images/logo1.png' %}" alt="AR Kitchen Logo" height="100;" width="130;" class="me-3"  loading="lazy"> <!-- Bigger logo -->
+            </a>
+          
+            <form action="{% url 'shop:shop' %}" method="get" class="d-none d-md-flex flex-grow-1 mx-3" style="max-width:700px; min-width:200px;">
+    <div class="input-group input-group-sm">
+        <input name="q" class="form-control rounded-start-pill" type="search" 
+               placeholder="Search cakes, gifts, flavours..." aria-label="Search" 
+               style="box-shadow:none;" value="{{ request.GET.q }}">
+        <button class="btn btn-success rounded-end-pill px-3" type="submit" 
+                style="border-top-left-radius:0;border-bottom-left-radius:0;">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+</form>
+            
+                <div class="d-flex align-items-center ms-5 gap-3">
+    <div class="d-flex align-items-center">
+    <i class="bi bi-person-circle" style="font-size: 2.2rem; color: #502912;"></i>
+    <div class="d-flex flex-column ms-2">
+        <a href="#" class="text-dark fw-semibold text-decoration-none">Login</a>
+        <a href="#" class="text-dark fw-semibold text-decoration-none">Register</a>
+    </div>
+</div>
+    <div class="vertical-divider"></div>
+
+    <div class="d-flex align-items-center">
+    <i class="bi bi-cart3" style="font-size: 2.2rem; color: #502912;"></i>
+    <div class="d-flex flex-column ms-2">
+        <a href="{% url 'shop:cart' %}" class="text-dark fw-semibold text-decoration-none">Shopping Cart</a>
+        {% if request.session.cart %}
+            <small class="text-success">({{ request.session.cart|length }} items)</small>
+        {% endif %}
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm ">
+           <div class="container flex-column">
+        
+            {% if messages %}
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+        <!-- Second row: Menu items -->
+        <div class="w-100">
+            <div class="collapse navbar-collapse mt-2" id="navbarMenu">
+               <form class="d-lg-none mt-3">
+        <div class="input-group input-group-sm">
+          <input class="form-control rounded-start-pill" type="search" placeholder="Search cakes, gifts, flavours..." aria-label="Search" style="box-shadow:none;">
+          <button class="btn btn-success rounded-end-pill px-3" type="submit" style="border-top-left-radius:0;border-bottom-left-radius:0;">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+       <!-- DESKTOP: Normal Menu -->
+<ul class="navbar-nav mx-auto d-none d-lg-flex">
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:offers' %}">
+            <i class="fas fa-star"></i>
+            <span>Offers</span>
+        </a>
+    </li>
+
+    <li class="nav-item dropdown text-center">
+    <a class="nav-link dropdown-toggle px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" 
+       href="#" id="flavoursDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-ice-cream"></i>
+        <span>Flavours</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="flavoursDropdown">
+        {% for flavor in flavors %}
+            <li><a class="dropdown-item" href="{% url 'shop:shop' %}?flavor={{ flavor.id }}">{{ flavor.name }}</a></li>
+        {% empty %}
+            <li><a class="dropdown-item text-muted" href="#">No flavors yet</a></li>
+        {% endfor %}
+    </ul>
+</li>
+
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:custom_cake' %}">
+            <i class="fa-solid fa-paint-brush"></i>
+            <span>Custom Cake</span>
+        </a>
+    </li>
+
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:gift_boxes' %}">
+            <i class="fa-solid fa-gift"></i>
+            <span>Gift Boxes</span>
+        </a>
+    </li>
+
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:recipe' %}">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Recipe</span>
+        </a>
+    </li>
+
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:location' %}">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Location</span>
+        </a>
+    </li>
+
+    <li class="nav-item text-center">
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:contact' %}">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>Contact Us</span>
+        </a>
+    </li>
+</ul>
+
+<!-- MOBILE: Horizontal Scrollable Tabs -->
+<div class="d-lg-none w-100 mt-2 overflow-auto">
+    <div class="d-flex gap-2 pb-2" style="min-width: max-content;">
+        <a href="#" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fas fa-star"></i> Offers
+        </a>
+        <div class="dropdown d-inline">
+    <a class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap dropdown-toggle" 
+       href="#" role="button" data-bs-toggle="dropdown">
+        <i class="fa-solid fa-ice-cream"></i> Flavours
+    </a>
+    <ul class="dropdown-menu">
+        {% for flavor in flavors %}
+            <li><a class="dropdown-item" href="{% url 'shop:shop' %}?flavor={{ flavor.id }}">{{ flavor.name }}</a></li>
+        {% empty %}
+            <li><a class="dropdown-item text-muted" href="#">No flavors</a></li>
+        {% endfor %}
+    </ul>
+</div>
+        <a href="{% url 'shop:custom_cake' %}" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fa-solid fa-paint-brush"></i> Custom
+        </a>
+        <a href="#" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fa-solid fa-gift"></i> Gifts
+        </a>
+        <a href="#" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fa-solid fa-book-open"></i> Recipe
+        </a>
+        <a href="#" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fa-solid fa-location-dot"></i> Location
+        </a>
+        <a href="#" class="btn btn-outline-secondary rounded-pill px-3 py-2 text-nowrap">
+            <i class="fa-solid fa-envelope-open-text"></i> Contact
+        </a>
+    </div>
+</div>
+                 
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- ===== PAGE CONTENT ===== -->
+
+    {% block content %}
+    <!-- Child pages will inject content here -->
+    {% endblock %}
+
+
+<!-- Footer -->
+<footer class="footer bg-orange text-white pt-5 pb-3">
+  <div class="container">
+    <div class="row">
+
+    <!-- Brand & About -->
+<div class="col-md-3 mb-4 brand-about">
+    <h4 class="fw-bold brand-name">AR Kitchen</h4>
+    <p class="small brand-desc">
+        We offer homemade food prepared with fresh ingredients, free from chemicals and unhygienic practices.
+    </p>
+    <div class="d-flex gap-3 social-icons">
+        <a href="https://www.facebook.com/profile.php?id=100075601640685" target="_blank" class="social-link">
+            <i class="bi bi-facebook"></i>
+        </a>
+        <a href="https://instagram.com/arkitchen" target="_blank" class="social-link">
+            <i class="bi bi-instagram"></i>
+        </a>
+        <a href="https://wa.me/8801940372926" target="_blank" class="social-link">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="https://m.me/arkitchen" target="_blank" class="social-link">
+            <i class="bi bi-messenger"></i>
+        </a>
+    </div>
+</div>
+
+
+<!-- Quick Links -->
+<div class="col-md-3 mb-4 quick-links">
+    <h6 class="fw-bold">QUICK LINKS</h6>
+    <ul class="list-unstyled">
+        <li><a href="{% url 'shop:home' %}">Home</a></li>
+        <li><a href="#">About Chef</a></li>
+        <li><a href="{% url 'shop:shop' %}">Items</a></li>
+        <li><a href="{% url 'shop:contact' %}">Contact Us</a></li>
+        <li><a href="{% url 'shop:custom_cake' %}">Customize Your Cake</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="{% url 'shop:offers' %}">Offers</a></li>
+    </ul>
+</div>
+
+
+<!-- Contact Info -->
+<div class="col-md-3 mb-4 contact-info">
+    <h6 class="fw-bold text-uppercase">Contact</h6>
+    <p class="small"><i class="bi bi-geo-alt"></i> Floor 2nd, HS 1B, RD 52/1, Matuail, Jatrabari, Dhaka-1362</p>
+    <p class="small">
+        <a href="tel:+8801940372926" class="contact-link">
+            <i class="bi bi-telephone"></i> +880 1940-372926
+        </a>
+    </p>
+    <p class="small">
+        <a href="tel:+8801321744505" class="contact-link">
+            <i class="bi bi-telephone"></i> +880 1321-744505
+        </a>
+    </p>
+    <p class="small">
+        <a href="mailto:contact@arkitchen.com" class="contact-link">
+            <i class="bi bi-envelope"></i> contact@arkitchen.com
+        </a>
+    </p>
+</div>
+
+
+<!-- Map -->
+<div class="col-md-3 mb-4 footer-map">
+    <h6 class="fw-bold">MAP</h6>
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.445352652987!2d90.454737315368!3d23.712033584592!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b779730fb0b5%3A0xaff96648855e0b71!2sMatuail%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1710000000000!5m2!1sen!2sbd" 
+        width="100%" height="150" style="border:0;" 
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+
+    <h6 class="text-uppercase fw-bold mt-3">We Accept</h6>
+    <div class="payment-methods d-flex align-items-center gap-2 flex-wrap">
+        <img src="{% static 'images/BKash.png' %}" alt="bKash" width="40">
+        <img src="{% static 'images/Nagad.png' %}" alt="Nagad" width="40">
+        <i class="fab fa-cc-visa fs-4 text-white"></i>
+        <i class="fab fa-paypal fs-4 text-white"></i>
+        <i class="fas fa-wallet fs-4 text-white"></i>
+    </div>
+</div>
+
+    <hr class="border-light">
+
+    <!-- Bottom -->
+    <div class="footer-bottom">
+    <p class="small mb-1">✨ Pure • Hygienic • Homemade with Love</p>
+    <p class="small mb-0">©2025, <a href="#" class="fw-bold">AR Kitchen</a>. All rights reserved.</p>
+</div>
+  </div>
+</footer>
+
+
+{% load static %}
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-text" id="chatText">Need cake? Order now!</div>
+
+    <!-- Social Icons Menu -->
+    <div class="chat-menu" id="chatMenu">
+        <a href="tel:+8801940372926" title="Call Us" class="chat-icon call">
+            <i class="bi bi-telephone-fill"></i>
+        </a>
+        <a href="https://wa.me/8801940372926?text=Hi!%20I%20want%20to%20order%20a%20cake" target="_blank" title="WhatsApp" class="chat-icon whatsapp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="https://maps.google.com/?q=Floor+2nd,+HS+1B,+RD+52/1,+Matuail,+Jatrabari,+Dhaka-1362" target="_blank" title="Location" class="chat-icon location">
+            <i class="bi bi-geo-alt-fill"></i>
+        </a>
+        <a href="https://tiktok.com/@arkitchen" target="_blank" title="TikTok" class="chat-icon tiktok">
+            <i class="bi bi-tiktok"></i>
+        </a>
+        <a href="https://instagram.com/arkitchen" target="_blank" title="Instagram" class="chat-icon instagram">
+            <i class="bi bi-instagram"></i>
+        </a>
+        <a href="https://m.me/arkitchen" target="_blank" title="Messenger" class="chat-icon messenger">
+            <i class="bi bi-messenger"></i>
+        </a>
+    </div>
+
+    <!-- Main Chat Button -->
+    <button class="chat-btn" id="chatBtn" aria-label="Open Chat">
+        <i class="bi bi-chat-dots" id="chatBtnIcon"></i>
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBtn = document.getElementById('chatBtn');
+    const chatMenu = document.getElementById('chatMenu');
+    const chatText = document.getElementById('chatText');
+    const chatBtnIcon = document.getElementById('chatBtnIcon');
+    let expanded = false;
+
+    chatBtn.onclick = function(e) {
+        e.preventDefault();
+        expanded = !expanded;
+        
+        chatMenu.classList.toggle('active', expanded);
+        chatBtn.classList.toggle('active', expanded);
+        
+        // Animate text fade
+        chatText.style.opacity = expanded ? '0' : '1';
+        
+        // Change icon
+        chatBtnIcon.className = expanded ? 'bi bi-x-lg' : 'bi bi-chat-dots';
+        
+        // Add stagger animation to icons
+        if (expanded) {
+            document.querySelectorAll('.chat-icon').forEach((icon, i) => {
+                icon.style.animationDelay = `${i * 0.1}s`;
+            });
+        }
+    };
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('chatWidget').contains(e.target) && expanded) {
+            chatBtn.click();
+        }
+    });
+});
+</script>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+
+
+<script>
+document.getElementById('faqSearch')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+        item.style.display = question.includes(term) ? '' : 'none';
+    });
+});
+document.querySelectorAll('.rating-stars input').forEach(input => {
+    input.addEventListener('change', function() {
+        const labels = this.closest('.rating-stars').querySelectorAll('label');
+        labels.forEach((label, i) => {
+            label.style.color = i < this.value ? '#ffc107' : '#ddd';
+        });
+    });
+});
+</script> 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('filterToggleBtn');
+    const dropdown = document.getElementById('filterDropdown');
+    const overlay = document.createElement('div');
+    overlay.className = 'filter-overlay';
+    document.body.appendChild(overlay);
+
+    function openDropdown() {
+        dropdown.classList.add('active');
+        overlay.classList.add('active');
+        toggleBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDropdown() {
+        dropdown.classList.remove('active');
+        overlay.classList.remove('active');
+        toggleBtn.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.contains('active') ? closeDropdown() : openDropdown();
+    });
+
+    overlay.addEventListener('click', closeDropdown);
+    document.addEventListener('click', function(e) {
+        if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target) && dropdown.classList.contains('active')) {
+            closeDropdown();
+        }
+    });
+
+    
+});
+</script>
+
+</body>
+</html>

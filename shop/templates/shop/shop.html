@@ -1,0 +1,300 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Shop - AR Kitchen{% endblock %}
+
+{% block extra_head %}
+<style>
+    .filter-card { background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .product-card { transition: all 0.3s; border: none; border-radius: 15px; overflow: hidden; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .price-tag { font-size: 1.3rem; color: #e91e63; font-weight: 800; }
+    .flavor-badge { background: #ffeb3b; color: #333; font-size: 0.75rem; padding: 4px 8px; border-radius: 20px; }
+    .filter-btn { background: #502912; color: white; }
+    .filter-btn:hover { background: #3a1f0d; }
+
+   .filter-toggle-btn {
+        background: #502912;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 5px 15px rgba(80, 41, 18, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .filter-toggle-btn:hover {
+        background: #3a1f0d;
+        transform: translateY(-2px);
+    }
+
+    .filter-toggle-btn i:last-child {
+        transition: transform 0.3s ease;
+    }
+
+    .filter-toggle-btn.active i:last-child {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown Panel */
+    .filter-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 320px;
+        margin-top: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .filter-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .filter-dropdown .shadow-sm {
+        border: 1px solid #eee;
+    }
+
+    /* Close on outside click */
+    .filter-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 999;
+        display: none;
+    }
+
+    .filter-overlay.active {
+        display: block;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .filter-toggle-btn {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+        .filter-dropdown {
+            width: 280px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+        }
+        .filter-dropdown.active {
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    .product-card {
+        border-radius: 16px !important;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(80, 41, 18, 0.15) !important;
+    }
+
+    .product-card:hover img {
+        transform: scale(1.08);
+    }
+
+    .product-card .overflow-hidden {
+        border-radius: 16px 16px 0 0;
+        overflow: hidden;
+    }
+
+    /* FLAVOR BADGE */
+    .flavor-badge {
+        background: #fff3cd;
+        color: #856404;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* PRICE TAG */
+    .price-tag {
+        font-size: 1.1rem;
+        color: #d63384 !important;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .product-card img {
+            height: 200px !important;
+        }
+        .product-card .p-3 {
+            padding: 1rem !important;
+        }
+    }
+
+    .product-card .bi-box {
+        color: #502912;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+
+        <!-- FILTER BUTTON + DROPDOWN -->
+        <div class="position-relative d-inline-block">
+            <button class="filter-toggle-btn" id="filterToggleBtn">
+                <i class="bi bi-funnel"></i> Filters
+                <i class="bi bi-chevron-down ms-2"></i>
+            </button>
+
+            <!-- DROPDOWN FILTER PANEL -->
+            <div class="filter-dropdown" id="filterDropdown">
+                <div class="p-3 bg-white shadow-sm rounded">
+                    <form method="get" id="filterForm">
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Category</label>
+                            <select name="category" class="form-select form-select-sm">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Flavor -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Flavor</label>
+                            <select name="flavor" class="form-select form-select-sm">
+                                <option value="">Any Flavor</option>
+                                {% for flavor in flavors %}
+                                <option value="{{ flavor.id }}" {% if selected_flavor|add:0 == flavor.id %}selected{% endif %}>
+                                    {{ flavor.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Price Range</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" name="min_price" placeholder="Min" class="form-control form-control-sm" value="{{ min_price }}">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="max_price" placeholder="Max" class="form-control form-control-sm" value="{{ max_price }}">
+                                </div>
+                                </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn filter-btn btn-sm">Apply</button>
+                            <a href="{% url 'shop:shop' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUCT GRID -->
+        <div class="col-lg-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold" style="color: #502912;">
+            {% if selected_category %}{{ selected_category|title }}{% else %}All Cakes{% endif %}
+            ({{ products.count }})
+        </h3>
+    </div>
+
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+                <div class="product-card h-100 shadow-sm border-0 overflow-hidden">
+                    <!-- FULL WIDTH IMAGE -->
+                    <div class="position-relative overflow-hidden">
+                        <img src="{{ product.image.url }}" 
+                             class="w-100 h-100" 
+                             alt="{{ product.name }}" 
+                             style="height: 250px; object-fit: cover; transition: transform 0.4s ease;">
+                    </div>
+
+                    <!-- CARD BODY -->
+                    <div class="p-3 bg-white">
+                        <h6 class="fw-bold text-dark mb-2">{{ product.name }}</h6>
+                        
+                        {% if product.weight %}
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-box"></i> {{ product.weight }}
+                        </p>
+                        {% endif %}
+
+                        <!-- FLAVORS -->
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            {% for flavor in product.flavors.all %}
+                            <span class="flavor-badge px-2 py-1 small">{{ flavor.name }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- PRICE + CATEGORY -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price-tag fw-bold text-danger">৳{{ product.price }}</span>
+                            <small class="text-muted">{{ product.category.name }}</small>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No cakes found. Try different filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+            <!-- PAGINATION -->
+            {% if products.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:":6" }}{% endif %}">Previous</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:":6" }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|slice:":6" }}{% endif %}">Next</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

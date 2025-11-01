@@ -1,0 +1,23 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block title %}Recipe - AR Kitchen{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center fw-bold mb-5" style="color: #502912;">Vanilla Cake Recipe</h2>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <img src="{% static 'images/recipe.jpg' %}" class="img-fluid rounded mb-4">
+            <h4>Ingredients:</h4>
+            <ul>
+                <li>2 cups flour</li>
+                <li>1.5 cups sugar</li>
+                <li>3 eggs</li>
+            </ul>
+            <h4>Steps:</h4>
+            <ol>
+                <li>Mix dry ingredients...</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

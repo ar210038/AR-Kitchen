@@ -1,0 +1,85 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - AR Kitchen{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Image -->
+        <div class="col-lg-6">
+            <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}" style="max-height: 500px; object-fit: cover;">
+        </div>
+
+        <!-- Details -->
+        <div class="col-lg-6">
+            <h1 class="fw-bold" style="color: #502912;">{{ product.name }}</h1>
+            <div class="d-flex gap-2 mb-3">
+                {% for flavor in product.flavors.all %}
+                <span class="badge rounded-pill" style="background: #ffeb3b; color: #333;">{{ flavor.name }}</span>
+                {% endfor %}
+            </div>
+            <p class="text-muted fs-5">{{ product.category.name }}</p>
+
+            <p class="price-tag display-6 mb-4">৳{{ product.price }}
+                    {% if product.weight %}
+                    <small class="text-muted d-block fs-5">per {{ product.weight }}</small>
+                    {% endif %}
+                </p>
+
+            <p class="lead,text-dark">{{ product.description|linebreaks }}</p>
+
+            <div class="d-grid gap-2 d-md-flex mb-4">
+                <form method="post" action="{% url 'shop:add_to_cart' product.slug %}">
+      
+                    {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg px-1">
+                    <i class="bi bi-cart-plus"></i> Add to Cart
+                </button>
+            </form>
+            <a href="{% url 'shop:shop' %}" class="btn btn-outline-secondary btn-lg px-1">Back to Shop</a>
+
+              <a href="{% url 'shop:custom_cake'%}" 
+                class="btn btn-warning text-dark btn-lg px-5 d-flex align-items-center gap-2">
+                    <i class="bi bi-palette"></i> Customize
+                </a>
+            </div>
+
+            <div class="alert alert-info rounded-pill border-0">
+                <i class="bi bi-truck"></i> 
+                <strong>Delivery:</strong> Same-day if ordered before 12 PM. Pickup available.
+            </div>
+        </div>
+    </div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}">Shop</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></li>
+    <li class="breadcrumb-item active">{{ product.name }}</li>
+  </ol>
+</nav>
+    <!-- Related Products -->
+    <div class="mt-5">
+        <h3 class="fw-bold mb-4">You Might Also Like</h3>
+        <div class="row g-4">
+            {% for related in product.category.products.all|slice:":4" %}
+            {% if related != product and related.available %}
+            <div class="col-md-3">
+                <a href="{{ related.get_absolute_url }}" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="{{ related.image.url }}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                        <div class="card-body p-3">
+                            <h6 class="card-title">{{ related.name }}</h6>
+                            <p class="text-danger fw-bold">৳{{ related.price }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

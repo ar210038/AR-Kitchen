@@ -1,0 +1,30 @@
+{% extends 'shop/base.html' %}
+{% load humanize %}
+{% block title %}Special Offers - AR Kitchen{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center fw-bold mb-5" style="color: #502912;">Special Offers</h2>
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-md-4">
+            <div class="card h-100 border-danger shadow-sm">
+                <div class="position-absolute top-0 start-0 bg-danger text-white px-3 py-1 rounded-bottom">
+                    <small>OFFER</small>
+                </div>
+                <img src="{{ product.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5>{{ product.name }}</h5>
+                    <p class="text-danger fw-bold">
+                      ৳{{ product.price|intcomma }} 
+                      <del class="text-muted small">৳{{ product.price|add:200|intcomma }}</del>
+                  </p>
+                    <a href="{{ product.get_absolute_url }}" class="btn btn-outline-danger btn-sm">Grab Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No offers right now. Check back soon!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
