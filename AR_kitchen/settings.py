@@ -24,8 +24,14 @@ SECRET_KEY = 'django-insecure-ratc8&i9yg%e6sg^fah76*4jzc+dbu#k016lzotxirih37nk$%
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+import os
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'ar-kitchen-i9i5.onrender.com',  # ← YOUR RENDER URL
+    '.onrender.com',                 # ← WILDCARD FOR ALL RENDER SUBDOMAINS
+]
 
 
 # Application definition
