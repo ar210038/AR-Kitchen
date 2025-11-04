@@ -1,23 +1,44 @@
 # shop/forms.py
 from django import forms
-from .models import Order, CustomCake , FAQ , Feedback
+from .models import Order, FAQ , Feedback
+from django.utils import timezone
 
 class CheckoutForm(forms.ModelForm):
+    
+    delivery_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': timezone.now().date()}),
+        help_text="Select your preferred delivery/pickup date"
+    )
+    
     class Meta:
         model = Order
-        fields = ['name', 'phone', 'address', 'delivery_method', 'payment_method', 'note']
+        fields = ['name', 'phone', 'address', 'delivery_method', 'delivery_date', 'note']
         widgets = {
-            'address': forms.Textarea(attrs={'rows': 3}),
-            'note': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Special instructions...'}),
+           'note': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Any special instructions?'}),
+            'address': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Full address (required for delivery)'}),
         }
+    def clean(self):
+        cleaned_data = super().clean()
+        method = cleaned_data.get('delivery_method')
+        address = cleaned_data.get('address', '')
+
+        if method == 'delivery' and not address.strip():
+            self.add_error('address', "Address is required for home delivery.")
+        return cleaned_data
+    
+# shop/forms.py
+from django import forms
+from .models import CustomCakeRequest
 
 class CustomCakeForm(forms.ModelForm):
     class Meta:
-        model = CustomCake
-        fields = '__all__'
+        model = CustomCakeRequest
+        fields = ['name', 'phone', 'email', 'flavor', 'weight', 'delivery_date','message', 'design_image', 'note']
         widgets = {
-            'message': forms.Textarea(attrs={'rows': 2}),
-            'note': forms.Textarea(attrs={'rows': 3}),
+            'delivery_date': forms.DateInput(attrs={'type': 'date', 'min': timezone.now().strftime('%Y-%m-%d')}),
+            'message': forms.Textarea(attrs={'rows': 3}),
+            'note': forms.Textarea(attrs={'rows': 2}),
+            'design_image': forms.FileInput(attrs={'accept': 'image/*'}),
         }
         
 # shop/forms.py

@@ -14,9 +14,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
+    <!-- In <head> -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 
     {% block extra_head %}{% endblock %}
+
+    <style>
+    #chatWidget {
+        transition: all 0.3s ease;
+    }
+    #chatMenu .btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    #chatMenu a:nth-child(1) { animation-delay: 0.1s; }
+    #chatMenu a:nth-child(2) { animation-delay: 0.2s; }
+    #chatMenu a:nth-child(3) { animation-delay: 0.3s; }
+    #chatMenu a:nth-child(4) { animation-delay: 0.4s; }
+
+    /* Mobile: Smaller */
+    @media (max-width: 576px) {
+        #chatBtn { width: 55px; height: 55px; }
+        #chatMenu .btn { width: 44px; height: 44px; font-size: 1.1rem; }
+    }
+</style>
 </head>
 <body>
 
@@ -59,24 +86,51 @@
 </form>
             
                 <div class="d-flex align-items-center ms-5 gap-3">
-    <div class="d-flex align-items-center">
-    <i class="bi bi-person-circle" style="font-size: 2.2rem; color: #502912;"></i>
-    <div class="d-flex flex-column ms-2">
-        <a href="#" class="text-dark fw-semibold text-decoration-none">Login</a>
-        <a href="#" class="text-dark fw-semibold text-decoration-none">Register</a>
-    </div>
-</div>
+                    {% if user.is_authenticated %}
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle" style="font-size: 2.2rem; color: #502912;"></i>
+                            <div class="d-flex flex-column ms-2">
+                                <!-- MY ORDERS LINK -->
+                                <a href="{% url 'accounts:profile' %}" class="text-dark fw-semibold text-decoration-none">
+                                    My Orders
+                                </a>
+                                <!-- LOGOUT LINK -->
+                                <a href="{% url 'accounts:logout' %}?next={{ request.path }}" class="text-dark fw-semibold text-decoration-none">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle" style="font-size: 2.2rem; color: #502912;"></i>
+                            <div class="d-flex flex-column ms-2">
+                                    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-dark fw-semibold text-decoration-none">Login</a>
+                                <a href="{% url 'accounts:register' %}" class="text-dark fw-semibold text-decoration-none">Register</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
     <div class="vertical-divider"></div>
 
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center position-relative">
     <i class="bi bi-cart3" style="font-size: 2.2rem; color: #502912;"></i>
+    
+    <!-- CART LINK + LIVE BADGE -->
     <div class="d-flex flex-column ms-2">
-        <a href="{% url 'shop:cart' %}" class="text-dark fw-semibold text-decoration-none">Shopping Cart</a>
-        {% if request.session.cart %}
-            <small class="text-success">({{ request.session.cart|length }} items)</small>
-        {% endif %}
+        <a href="{% url 'shop:cart' %}" class="text-dark fw-semibold text-decoration-none">
+            Orders
+        </a>
+        
     </div>
-    </div>
+
+    <!-- OPTIONAL: RED DOT BADGE (LIKE AMAZON) -->
+    {% if request.session.cart %}
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+          style="font-size: 0.7rem; padding: 0.35em 0.65em;">
+        {{ request.session.cart|length }}
+        <span class="visually-hidden">items in cart</span>
+    </span>
+    {% endif %}
+</div>
     </div>
     </div>
     </div>
@@ -139,9 +193,9 @@
     </li>
 
     <li class="nav-item text-center">
-        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:gift_boxes' %}">
-            <i class="fa-solid fa-gift"></i>
-            <span>Gift Boxes</span>
+        <a class="nav-link px-3 py-2 text-dark fw-semibold hover-style d-flex flex-column align-items-center" href="{% url 'shop:shop' %}">
+            <i class="fa-solid fa-cake"></i>
+            <span>Cakes</span>
         </a>
     </li>
 
@@ -311,7 +365,8 @@
 
 
 {% load static %}
-<div class="chat-widget" id="chatWidget">
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    <div class="chat-widget shadow-lg" id="chatWidget">
     <div class="chat-text" id="chatText">Need cake? Order now!</div>
 
     <!-- Social Icons Menu -->
@@ -335,12 +390,38 @@
             <i class="bi bi-messenger"></i>
         </a>
     </div>
+    </div>
 
     <!-- Main Chat Button -->
     <button class="chat-btn" id="chatBtn" aria-label="Open Chat">
         <i class="bi bi-chat-dots" id="chatBtnIcon"></i>
     </button>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBtn = document.getElementById('chatBtn');
+    const chatMenu = document.getElementById('chatMenu');
+    const chatIcon = document.getElementById('chatIcon');
+    let isOpen = false;
+
+    chatBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        chatMenu.style.display = isOpen ? 'flex' : 'none';
+        chatIcon.className = isOpen ? 'bi bi-x-lg fs-5' : 'bi bi-chat-dots fs-4';
+        chatBtn.classList.toggle('shadow-lg', !isOpen);
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+        if (isOpen && !document.getElementById('chatWidget').contains(e.target)) {
+            chatBtn.click();
+        }
+    });
+});
+</script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

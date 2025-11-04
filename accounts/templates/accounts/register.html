@@ -1,0 +1,25 @@
+<!-- accounts/templates/accounts/register.html -->
+{% extends 'shop/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm p-4">
+            <h2 class="fw-bold text-center mb-4" style="color: #502912;">Create Account</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.username|as_crispy_field }}
+                {{ form.email|as_crispy_field }}
+                {{ form.phone|as_crispy_field }}
+                {{ form.address|as_crispy_field }}
+                {{ form.password1|as_crispy_field }}
+                {{ form.password2|as_crispy_field }}
+                <button type="submit" class="btn btn-success w-100">Register</button>
+            </form>
+            <p class="text-center mt-3"><a href="{% url 'accounts:login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -60,7 +60,6 @@
         </div>
 
     </div>
-
     <!-- Controls -->
     <button class="carousel-control-prev" type="button" data-bs-target="#cakeCarousel" data-bs-slide="prev">
         <span class="carousel-control-prev-icon"></span>
@@ -69,14 +68,12 @@
         <span class="carousel-control-next-icon"></span>
     </button>
 </div>
-
-    <!-- Reviews -->
+  <!-- Reviews -->
 <section id="reviews" class="py-1 bg-light">
   <div class="container">
     <div class="d-flex justify-content-center mb-5">
   <h2 class="section-title">Reviews</h2>
 </div>
-
     <div id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
       <div class="carousel-inner">
         {% for slide in slides %}
@@ -96,11 +93,6 @@
     </div>
   </div>
 </section>
-
-
-
-
-
 <!-- Featured Cakes -->
 <section class="py-5 bg-light" id="featured">
   <div class="container">
@@ -128,9 +120,13 @@
         <p class="text-center text-muted">No featured cakes yet. Add in admin.</p>
       {% endfor %}
     </div>
+    <div class="text-center mt-5">
+            <a href="{% url 'shop:shop' %}" class="btn btn-outline-primary btn-lg px-5 rounded-pill">
+                View All Products
+            </a>
+        </div>
   </div>
 </section>
-
 <!-- Categories -->
 <section id="categories" class="py-5 bg-white">
     <div class="container">
@@ -161,22 +157,15 @@
             <p class="text-center col-12 text-muted">No categories available.</p>
             {% endfor %}
         </div>
-        <div class="text-center mt-5">
-            <a href="{% url 'shop:shop' %}" class="btn btn-outline-primary btn-lg px-5 rounded-pill">
-                View All Products
-            </a>
-        </div>
+        
     </div>
 </section>
-  
-
 <section class="py-5 bg-light" id="faq">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="fw-bold display-5" style="color: #502912;">Frequently Asked Questions</h2>
             <p class="text-muted lead">Got questions? We’ve got answers!</p>
         </div>
-
         <!-- SEARCH BAR -->
         <div class="row justify-content-center mb-4">
             <div class="col-lg-8">
@@ -186,7 +175,6 @@
                 </div>
             </div>
         </div>
-
         <!-- FAQ LIST -->
         <div class="accordion" id="faqAccordion">
             {% for faq in faqs %}

@@ -15,10 +15,12 @@
                         <div class="col-md-6">{{ form.phone|as_crispy_field }}</div>
                         <div class="col-md-6">{{ form.email|as_crispy_field }}</div>
                         <div class="col-md-6">{{ form.flavor|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.size|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.weight|as_crispy_field }}</div>  <!-- SIZE → WEIGHT -->
+                        <div class="col-md-6">{{ form.delivery_date|as_crispy_field }}</div>
                         <div class="col-12">{{ form.message|as_crispy_field }}</div>
                         <div class="col-12">{{ form.design_image|as_crispy_field }}</div>
                         <div class="col-12">{{ form.note|as_crispy_field }}</div>
+                        
                     </div>
                     <button type="submit" class="btn btn-success w-100 mt-3 btn-lg">Send Request</button>
                 </form>

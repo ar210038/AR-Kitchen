@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Flavor, Product, Order, Review, FAQ , Feedback
+from .models import Category, Flavor, Product, Order, Review, FAQ , Feedback, CustomCakeRequest
 from django.utils.html import format_html
 from django.utils import timezone
 
@@ -29,13 +29,52 @@ class ProductAdmin(admin.ModelAdmin):
     filter_horizontal = ['flavors']
     fields = ['name', 'slug', 'description', 'price', 'weight', 'image', 'category', 'flavors']
     
-    # shop/admin.py
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import Product, Order, OrderItem, Category
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    fields = ['product', 'quantity', 'price']
+    readonly_fields = ['price']
+
+    def has_add_permission(self, request, obj=None):
+        return False 
+    
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'phone', 'total', 'delivery_method', 'payment_method', 'created', 'paid']
-    list_filter = ['delivery_method', 'payment_method', 'created']
-    readonly_fields = ['created']
+    list_display = ['id', 'name', 'phone', 'delivery_method', 'delivery_date', 'total', 'created']
+    list_filter = ['delivery_method', 'delivery_date', 'created']
+    search_fields = ['name', 'phone', 'id']
+    readonly_fields = ['total', 'created']
+    inlines = [OrderItemInline]
+  
 
+         
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ['order', 'product_name_with_image', 'quantity', 'price']
+    list_select_related = ['product', 'order']
+
+    def product_name_with_image(self, obj):
+        if obj.product.image:
+            return format_html(
+                '<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 5px;" /> {}',
+                obj.product.image.url, obj.product.name
+            )
+        return obj.product.name
+    product_name_with_image.short_description = 'Cake'
+    product_name_with_image.allow_tags = True
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    fields = ['product', 'quantity', 'price']
+    readonly_fields = ['price']
+
+    def has_add_permission(self, request, obj=None):
+        return False
+       
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ['id', 'created']
@@ -63,3 +102,16 @@ class FeedbackAdmin(admin.ModelAdmin):
     def approve_feedback(self, request, queryset):
         queryset.update(is_approved=True)
     approve_feedback.short_description = "Approve selected feedback"        
+    
+# shop/admin.py
+@admin.register(CustomCakeRequest)
+class CustomCakeRequestAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'phone', 'flavor', 'weight', 'delivery_date','created', 'replied']
+    list_filter = ['weight', 'created', 'replied']
+    search_fields = ['name', 'phone', 'email']
+    readonly_fields = ['created']
+
+    def mark_as_replied(self, request, queryset):
+        queryset.update(replied=True)
+    mark_as_replied.short_description = "Mark as replied"
+    actions = [mark_as_replied]    

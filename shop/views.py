@@ -1,8 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages  # ← ADD THIS
 from .models import Product, Category, Review, FAQ , Feedback
-from .forms import FAQForm
-from .forms import FeedbackForm
+from .forms import FAQForm, FeedbackForm, CustomCakeForm
 from django.utils import timezone
 
 def home(request):
@@ -112,16 +111,30 @@ from django.contrib import messages
 
 # ... your existing views ...
 
+# shop/views.py
+from django.http import JsonResponse
+
 def add_to_cart(request, slug):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request'})
+
     product = get_object_or_404(Product, slug=slug, available=True)
     cart = request.session.get('cart', {})
     
     # Add or increase quantity
-    cart[slug] = cart.get(slug, 0) + 1
+    qty = int(request.POST.get('quantity', 1))
+    cart[slug] = cart.get(slug, 0) + qty
     request.session['cart'] = cart
-    messages.success(request, f"{product.name} added to cart!")
-    
-    return redirect('shop:cart')
+    request.session.modified = True  # Important for session
+
+    # Calculate total items
+    total_items = sum(cart.values())
+
+    return JsonResponse({
+        'success': True,
+        'message': f"{product.name} added to cart!",
+        'cart_count': total_items
+    })
 
 def cart(request):
     cart = request.session.get('cart', {})
@@ -165,9 +178,15 @@ def remove_from_cart(request, slug):
     messages.success(request, "Item removed from cart.")
     return redirect('shop:cart')
 
-# shop/views.py
-from .forms import CheckoutForm, CustomCakeForm
-from .models import Order, OrderItem
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from .forms import CheckoutForm
+from .models import Order, OrderItem, Product
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+
+
 
 def checkout(request):
     cart = request.session.get('cart', {})
@@ -175,23 +194,61 @@ def checkout(request):
         messages.error(request, "Your cart is empty.")
         return redirect('shop:shop')
 
-    # Calculate total
-    total = 0
+    # === CALCULATE CART ITEMS ===
     cart_items = []
+    subtotal = 0
     for slug, qty in cart.items():
         product = get_object_or_404(Product, slug=slug)
-        subtotal = product.price * qty
-        total += subtotal
-        cart_items.append({'product': product, 'quantity': qty, 'subtotal': subtotal})
+        item_total = product.price * qty
+        subtotal += item_total
+        cart_items.append({
+            'product': product,
+            'quantity': qty,
+            'subtotal': item_total
+        })
+
+    # === INITIAL FORM DATA (BEFORE POST) ===
+    initial_data = {'delivery_date': timezone.now().date()}
+    if request.user.is_authenticated:
+        initial_data.update({
+            'name': request.user.get_full_name() or request.user.username,
+            'phone': getattr(request.user, 'phone', ''),
+            'email': request.user.email or '',
+        })
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
+        create_account = request.POST.get('create_account')
+
         if form.is_valid():
             order = form.save(commit=False)
-            order.total = total
+            
+            # === LINK TO LOGGED-IN USER ===
+        if request.user.is_authenticated:
+            order.user = request.user  # ← ADD THIS
+            # Optional: override form data with user data
+            if not order.phone:
+                order.phone = request.user.phone
+            if not order.name:
+                order.name = request.user.get_full_name() or request.user.username
+            
+            # === DELIVERY FEE ===
+            delivery_fee = 100 if order.delivery_method == 'delivery' else 0
+            order.total = subtotal + delivery_fee
             order.save()
 
-            # Save items
+            # === CREATE ACCOUNT IF CHECKED ===
+            if create_account and not request.user.is_authenticated:
+                phone = form.cleaned_data['phone']
+                password = User.objects.make_random_password()
+                user = User.objects.create_user(username=phone, password=password)
+                user.phone = phone
+                user.email = form.cleaned_data.get('email', '')
+                user.save()
+                login(request, user)
+                messages.info(request, f"Account created! Username: {phone}")
+
+            # === SAVE ORDER ITEMS ===
             for item in cart_items:
                 OrderItem.objects.create(
                     order=order,
@@ -200,18 +257,28 @@ def checkout(request):
                     quantity=item['quantity']
                 )
 
-            # Clear cart
+            # === CLEAR CART ===
             request.session['cart'] = {}
-            messages.success(request, f"Order #{order.id} placed! We'll call you soon.")
+            messages.success(request, f"Order #{order.id} placed!")
             return redirect('shop:order_success', order_id=order.id)
     else:
-        form = CheckoutForm()
+        form = CheckoutForm(initial=initial_data)
 
-    return render(request, 'shop/checkout.html', {
+    # === TOTAL FOR DISPLAY (LIVE UPDATE VIA JS) ===
+    delivery_method = request.POST.get('delivery_method') if request.method == 'POST' else 'pickup'
+    total = subtotal + (100 if delivery_method == 'delivery' else 0)
+
+    context = {
         'form': form,
         'cart_items': cart_items,
-        'total': total
-    })
+        'subtotal': subtotal,
+        'total': total,
+    }
+    return render(request, 'shop/checkout.html', context)
+
+# shop/views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Order
 
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -265,17 +332,37 @@ def shop(request):
     }
     return render(request, 'shop/shop.html', context)
 
+# shop/views.py
+from .forms import CustomCakeForm
+from .models import CustomCakeRequest
+
 def custom_cake(request):
     if request.method == 'POST':
         form = CustomCakeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Custom cake request sent! We'll call you.")
+            custom = form.save(commit=False)
+            if request.user.is_authenticated:
+                custom.user = request.user
+                if not custom.phone:
+                    custom.phone = request.user.phone
+                if not custom.name:
+                    custom.name = request.user.get_full_name() or request.user.username
+                if not custom.email:
+                    custom.email = request.user.email
+            custom.save()
+            messages.success(request, "Your custom cake request has been sent!")
             return redirect('shop:shop')
     else:
-        form = CustomCakeForm()
-    return render(request, 'shop/custom_cake.html', {'form': form})
+        initial = {}
+        if request.user.is_authenticated:
+            initial = {
+                'name': request.user.get_full_name() or request.user.username,
+                'phone': request.user.phone,
+                'email': request.user.email,
+            }
+        form = CustomCakeForm(initial=initial)
 
+    return render(request, 'shop/custom_cake.html', {'form': form})
 
 def offers(request):
     # Show featured/discount products

@@ -33,11 +33,11 @@ class Product(models.Model):
     flavors = models.ManyToManyField(Flavor, blank=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
     featured = models.BooleanField(default=False)
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
-    weight = models.CharField(max_length=50, blank=True, help_text="e.g. 1kg, 500g, 2lb")
+    weight = models.CharField(max_length=50, blank=True, help_text="e.g. 1lbs, 500g, 2lb")
     
     def __str__(self):
         return self.name
@@ -45,28 +45,34 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('shop:product_detail', args=[self.slug])
 
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     DELIVERY_CHOICES = [
         ('pickup', 'Pickup from Outlet'),
-        ('delivery', 'Home Delivery'),
+        ('delivery', 'Home Delivery (+৳100)'),
     ]
-    PAYMENT_CHOICES = [
-        ('bkash', 'bKash'),
-        ('nagad', 'Nagad'),
-        ('cod', 'Cash on Delivery'),
-    ]
+    
 
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     address = models.TextField(blank=True)
     delivery_method = models.CharField(max_length=10, choices=DELIVERY_CHOICES)
-    payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)
+    delivery_date = models.DateField(help_text="When do you want your cake?")
     note = models.TextField(blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
     paid = models.BooleanField(default=False)
+    
+    def clean(self):
+        if self.delivery_date < timezone.now().date():
+            raise ValidationError("Delivery date cannot be in the past.")
 
+    
+    
     def __str__(self):
         return f"Order {self.id} - {self.name}"
 
@@ -95,25 +101,39 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
 
-class CustomCake(models.Model):
-    SIZE_CHOICES = [
-        ('6inch', '6 inch (4-6 people)'),
-        ('8inch', '8 inch (8-12 people)'),
-        ('10inch', '10 inch (15-20 people)'),
+# shop/models.py
+from django.contrib.auth.models import User
+
+class CustomCakeRequest(models.Model):
+    WEIGHT_CHOICES = [
+        ('0.5 lbs', '0.5 lbs'),
+        ('1 lbs', '1 lbs'),
+        ('2 lbs', '2 lbs'),
+        ('3 lbs', '3+ lbs'),
     ]
 
+    FLAVOR_CHOICES = [
+        ('chocolate', 'Chocolate'),
+        ('vanilla', 'Vanilla'),
+        ('red_velvet', 'Red Velvet'),
+        ('strawberry', 'Strawberry'),
+        ('custom', 'Custom'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='custom_requests')
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
-    email = models.EmailField(blank=True)
-    flavor = models.ForeignKey('Flavor', on_delete=models.SET_NULL, null=True, related_name='custom_cakes')
-    size = models.CharField(max_length=10, choices=SIZE_CHOICES)
-    message = models.TextField(help_text="Message on cake")
-    design_image = models.ImageField(upload_to='custom/', blank=True)
+    email = models.EmailField()
+    flavor = models.CharField(max_length=100)
+    weight = models.CharField(max_length=10, choices=WEIGHT_CHOICES)
+    message = models.TextField()
+    design_image = models.ImageField(upload_to='custom_designs/', blank=True, null=True)
     note = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
-
+    replied = models.BooleanField(default=False)
+    delivery_date = models.DateField(help_text="When do you want your cake?") 
     def __str__(self):
-        return f"Custom Cake - {self.name}"
+        return f"Custom Cake - {self.name} ({self.weight})"
 
 
 class Review(models.Model):

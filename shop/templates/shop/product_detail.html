@@ -22,42 +22,49 @@
             <p class="text-muted fs-5">{{ product.category.name }}</p>
 
             <p class="price-tag display-6 mb-4">৳{{ product.price }}
-                    {% if product.weight %}
-                    <small class="text-muted d-block fs-5">per {{ product.weight }}</small>
-                    {% endif %}
-                </p>
+                {% if product.weight %}
+                <small class="text-muted d-block fs-5">per {{ product.weight }}</small>
+                {% endif %}
+            </p>
 
-            <p class="lead,text-dark">{{ product.description|linebreaks }}</p>
+            <p class="lead text-dark">{{ product.description|linebreaks }}</p>
 
-            <div class="d-grid gap-2 d-md-flex mb-4">
-                <form method="post" action="{% url 'shop:add_to_cart' product.slug %}">
-      
-                    {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-lg px-1">
-                    <i class="bi bi-cart-plus"></i> Add to Cart
+            <!-- ADD TO CART FORM (AJAX) -->
+            <form class="add-to-cart-form" data-product-slug="{{ product.slug }}">
+                {% csrf_token %}
+                <div class="input-group mb-3" style="max-width: 150px;">
+                    <button type="button" class="btn btn-outline-secondary qty-minus">-</button>
+                    <input type="number" name="quantity" value="1" min="1" class="form-control text-center qty-input">
+                    <button type="button" class="btn btn-outline-secondary qty-plus">+</button>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg w-100">
+                    <i class="bi bi-cart-plus"></i> Order Now
                 </button>
             </form>
-            <a href="{% url 'shop:shop' %}" class="btn btn-outline-secondary btn-lg px-1">Back to Shop</a>
 
-              <a href="{% url 'shop:custom_cake'%}" 
-                class="btn btn-warning text-dark btn-lg px-5 d-flex align-items-center gap-2">
+            <div class="d-grid gap-2 d-md-flex mt-3">
+                <a href="{% url 'shop:shop' %}" class="btn btn-outline-secondary btn-lg">Back to Shop</a>
+                <a href="{% url 'shop:custom_cake' %}" class="btn btn-warning text-dark btn-lg d-flex align-items-center gap-2">
                     <i class="bi bi-palette"></i> Customize
                 </a>
             </div>
 
-            <div class="alert alert-info rounded-pill border-0">
+            <div class="alert alert-info rounded-pill border-0 mt-4">
                 <i class="bi bi-truck"></i> 
                 <strong>Delivery:</strong> Same-day if ordered before 12 PM. Pickup available.
             </div>
         </div>
     </div>
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}">Shop</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></li>
-    <li class="breadcrumb-item active">{{ product.name }}</li>
-  </ol>
-</nav>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mt-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}">Shop</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
     <!-- Related Products -->
     <div class="mt-5">
         <h3 class="fw-bold mb-4">You Might Also Like</h3>
@@ -81,5 +88,43 @@
     </div>
 </div>
 
+<!-- AJAX SCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.add-to-cart-form');
+    const minus = form.querySelector('.qty-minus');
+    const plus = form.querySelector('.qty-plus');
+    const input = form.querySelector('.qty-input');
+    const slug = form.dataset.productSlug;
 
+    minus.addEventListener('click', () => {
+        if (input.value > 1) input.value = parseInt(input.value) - 1;
+    });
+    plus.addEventListener('click', () => {
+        input.value = parseInt(input.value) + 1;
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch(`/add-to-cart/${slug}/`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart badge
+                const badge = document.getElementById('cart-count');
+                if (badge) badge.textContent = data.cart_count;
+                // Show success
+                alert(data.message);
+            }
+        })
+        .catch(err => console.error('Error:', err));
+    });
+});
+</script>
 {% endblock %}
