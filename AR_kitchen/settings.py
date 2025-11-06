@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ratc8&i9yg%e6sg^fah76*4jzc+dbu#k016lzotxirih37nk$%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['arkitchen.vercel.app', 'arkitchen.com', 'localhost']
 
 
 # Application definition
@@ -132,14 +132,27 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import os
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
+# MEDIA
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # settings.py
 LOGOUT_REDIRECT_URL = None  # Let `next` handle it
+
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'al-rafi210038@diit.edu.bd'
+EMAIL_HOST_PASSWORD = 'zjau dheo gqxi kfra'  # ← YOUR APP PASSWORD
+DEFAULT_FROM_EMAIL = 'AR Kitchen <al-rafi210038@diit.edu.bd>'
+
+# ADMIN EMAIL (SAME OR DIFFERENT)
+ADMIN_EMAILS = ['al-rafi210038@diit.edu.bd']

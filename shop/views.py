@@ -185,7 +185,8 @@ from .forms import CheckoutForm
 from .models import Order, OrderItem, Product
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def checkout(request):
@@ -207,7 +208,7 @@ def checkout(request):
             'subtotal': item_total
         })
 
-    # === INITIAL FORM DATA (BEFORE POST) ===
+    # === INITIAL FORM DATA ===
     initial_data = {'delivery_date': timezone.now().date()}
     if request.user.is_authenticated:
         initial_data.update({
@@ -222,22 +223,21 @@ def checkout(request):
 
         if form.is_valid():
             order = form.save(commit=False)
-            
-            # === LINK TO LOGGED-IN USER ===
-        if request.user.is_authenticated:
-            order.user = request.user  # ← ADD THIS
-            # Optional: override form data with user data
-            if not order.phone:
-                order.phone = request.user.phone
-            if not order.name:
-                order.name = request.user.get_full_name() or request.user.username
-            
+
+            # === LINK TO USER IF LOGGED IN (OPTIONAL) ===
+            if request.user.is_authenticated:
+                order.user = request.user
+                if not order.phone:
+                    order.phone = request.user.phone
+                if not order.name:
+                    order.name = request.user.get_full_name() or request.user.username
+
             # === DELIVERY FEE ===
             delivery_fee = 100 if order.delivery_method == 'delivery' else 0
             order.total = subtotal + delivery_fee
             order.save()
 
-            # === CREATE ACCOUNT IF CHECKED ===
+            # === CREATE ACCOUNT IF GUEST WANTS ===
             if create_account and not request.user.is_authenticated:
                 phone = form.cleaned_data['phone']
                 password = User.objects.make_random_password()
@@ -257,6 +257,41 @@ def checkout(request):
                     quantity=item['quantity']
                 )
 
+            # === ADMIN EMAIL (EMAIL FROM FORM) ===
+            customer_email = form.cleaned_data.get('email', 'N/A')
+            items_list = "\n".join([
+                f"- {item['quantity']} × {item['product'].name} (৳{item['subtotal']})"
+                for item in cart_items
+            ])
+
+            subject = f"New Order #{order.id} - {order.name}"
+            message = f"""
+NEW ORDER!
+
+Order #{order.id}
+Customer: {order.name}
+Phone: {order.phone}
+Email: {customer_email}
+Total: ৳{order.total}
+Delivery: {order.get_delivery_method_display()}
+Date: {order.delivery_date}
+
+Items:
+{items_list}
+
+Notes: {order.note or 'None'}
+
+Admin: {request.build_absolute_uri('/admin/shop/order/' + str(order.id) + '/change/')}
+"""
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                settings.ADMIN_EMAILS,
+                fail_silently=False,
+            )
+
             # === CLEAR CART ===
             request.session['cart'] = {}
             messages.success(request, f"Order #{order.id} placed!")
@@ -264,9 +299,7 @@ def checkout(request):
     else:
         form = CheckoutForm(initial=initial_data)
 
-    # === TOTAL FOR DISPLAY (LIVE UPDATE VIA JS) ===
-    delivery_method = request.POST.get('delivery_method') if request.method == 'POST' else 'pickup'
-    total = subtotal + (100 if delivery_method == 'delivery' else 0)
+    total = subtotal + (100 if request.POST.get('delivery_method') == 'delivery' else 0)
 
     context = {
         'form': form,
@@ -341,6 +374,8 @@ def custom_cake(request):
         form = CustomCakeForm(request.POST, request.FILES)
         if form.is_valid():
             custom = form.save(commit=False)
+
+            # === AUTO-FILL IF LOGGED IN ===
             if request.user.is_authenticated:
                 custom.user = request.user
                 if not custom.phone:
@@ -349,8 +384,39 @@ def custom_cake(request):
                     custom.name = request.user.get_full_name() or request.user.username
                 if not custom.email:
                     custom.email = request.user.email
+
             custom.save()
-            messages.success(request, "Your custom cake request has been sent!")
+
+            # === ADMIN EMAIL ===
+            subject = f"Custom Cake Request - {custom.name}"
+            message = f"""
+CUSTOM CAKE REQUEST!
+
+ID: #{custom.id}
+Name: {custom.name}
+Phone: {custom.phone}
+Email: {custom.email or 'N/A'}
+Flavor: {custom.flavor}
+Weight: {custom.get_weight_display()}
+Delivery: {custom.delivery_date}
+
+Message:
+{custom.message}
+
+Notes: {custom.note or 'None'}
+
+Admin: {request.build_absolute_uri('/admin/shop/customcakerequest/' + str(custom.id) + '/change/')}
+"""
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                settings.ADMIN_EMAILS,
+                fail_silently=False,
+            )
+
+            messages.success(request, "Request sent! We'll contact you soon.")
             return redirect('shop:shop')
     else:
         initial = {}
