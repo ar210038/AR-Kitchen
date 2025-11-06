@@ -2,14 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "AR_kitchen/wsgi.py",
+      "src": "wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
-    },
-    {
-      "src": "static/**/*",
-      "use": "@vercel/static"
+
     }
+    
   ],
   "routes": [
     { "src": "/static/(.*)", "dest": "/static/$1" },
