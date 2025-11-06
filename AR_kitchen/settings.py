@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ratc8&i9yg%e6sg^fah76*4jzc+dbu#k016lzotxirih37nk$%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['arkitchen.vercel.app', 'arkitchen.com', 'localhost']
+ALLOWED_HOSTS = [*]
 
 
 # Application definition
